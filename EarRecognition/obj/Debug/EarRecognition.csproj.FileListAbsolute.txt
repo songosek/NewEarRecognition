@@ -1,0 +1,15 @@
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\bin\Debug\EarRecognition.exe.config
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\bin\Debug\EarRecognition.exe
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\bin\Debug\EarRecognition.pdb
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\EarRecognition.csprojAssemblyReference.cache
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\MainWindow.g.cs
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\App.g.cs
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\EarRecognition_MarkupCompile.cache
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\EarRecognition_MarkupCompile.lref
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\MainWindow.baml
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\EarRecognition.g.resources
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\EarRecognition.Properties.Resources.resources
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\EarRecognition.csproj.GenerateResource.cache
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\EarRecognition.csproj.CoreCompileInputs.cache
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\EarRecognition.exe
+C:\Users\Werka\source\repos\EarRecognition\EarRecognition\obj\Debug\EarRecognition.pdb

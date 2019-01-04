@@ -1,0 +1,73 @@
+﻿<Window x:Class="EarRecognition.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EarRecognition"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="900">
+    <Grid>
+        <Canvas MouseDown="DrawPoint" Name="canvas" HorizontalAlignment="Left" Height="480" Width="319" Margin="35,23,0,0" VerticalAlignment="Top">
+            <Image Name="image" />
+        </Canvas>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="237" Margin="520,33,0,0" VerticalAlignment="Top" Width="344">
+            <StackPanel>
+                <Button Content="dodaj zdjecie" Command="{Binding AddImage}"/>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Podaj imię:"/>
+                    <TextBox Name="learningName" VerticalAlignment="Center" MinWidth="100" TextWrapping="Wrap"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Podaj nazwisko:"/>
+                    <TextBox Name="learningSurname" VerticalAlignment="Center" MinWidth="100" TextWrapping="Wrap"/>
+                </StackPanel>
+                <Label Content="Punkty krańcowe"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding LeftLearningPoint}" Content="Skrajny punkt po lewej:"/>
+                    <Label Content="Współrzędne" Name="lefLearningPoint"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding RightLearningPoint}" Content="Skrajny punkt po prawej:"/>
+                    <Label Content="Współrzędne" Name="rightLearningPoint"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding TopLearningPoint}" Content="Skrajny punkt na górze:"/>
+                    <Label Content="Współrzędne" Name="topLearningPoint"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding BottomLearningPoint}" Content="Skrajny punkt na dole:"/>
+                    <Label Content="Współrzędne" Name="bottomLearningPoint"/>
+                </StackPanel>
+
+                <Button Command="{Binding AddToDatabase}" Content="dodaj"/>
+
+            </StackPanel>
+        </Border>
+
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="236" Margin="520,296,0,0" VerticalAlignment="Top" Width="344">
+            <StackPanel>
+                <Button Content="wczytaj zdjęcie"/>
+                <Label Content="Punkty krańcowe"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Skrajny punkt po lewej:"/>
+                    <Label Content="Współrzędne"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Skrajny punkt po prawej:"/>
+                    <Label Content="Współrzędne"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Skrajny punkt na górze:"/>
+                    <Label Content="Współrzędne"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Skrajny punkt na dole:"/>
+                    <Label Content="Współrzędne"/>
+                </StackPanel>
+                <Button Content="Rozpoznaj"/>
+                <Label Content="(imię)"/>
+                <Label Content="(nazwisko)"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
