@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,19 +22,62 @@ namespace EarRecognition
     public partial class MainWindow : Window
     {
         private int clickedPointButton;
-        private Point? leftPoint;
-        private Point? rightPoint;
-        private Point? topPoint;
-        private Point? bottomPoint;
+        private System.Windows.Point? leftPoint;
+        private System.Windows.Point? rightPoint;
+        private System.Windows.Point? topPoint;
+        private System.Windows.Point? bottomPoint;
+
+        private Bitmap bitmap;
+
+        private ICommand _OpenDatabase;
+        private ICommand _CreateDatabase;
+        private ICommand _AddImage;
+        private ICommand _LeftLearningPoint;
+        private ICommand _RightLearningPoint;
+        private ICommand _TopLearningPoint;
+        private ICommand _BottomLearningPoint;
+        private ICommand _ClearPoints;
+        private ICommand _AddToDatabase;
+        private ICommand _Recognize;
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
             clickedPointButton = -1;
+            recognition.IsEnabled = false;
         }
 
-        private ICommand _AddImage;
+        #region ICommands
+
+        public ICommand OpenDatabase
+        {
+            get
+            {
+                if (_OpenDatabase == null)
+                {
+                    _OpenDatabase = new RelayCommand(
+                        param => OpenDatabaseClick(),
+                        param => { return true; });
+                }
+                return _OpenDatabase;
+            }
+        }
+    
+        public ICommand CreateDatabase
+        {
+            get
+            {
+                if (_CreateDatabase == null)
+                {
+                    _CreateDatabase = new RelayCommand(
+                        param => CreateDatabaseClick(),
+                        param => { return !mode.IsChecked.Value; });
+                }
+                return _CreateDatabase;
+            }
+        }
+
         public ICommand AddImage
         {
             get
@@ -41,28 +85,12 @@ namespace EarRecognition
                 if (_AddImage == null)
                 {
                     _AddImage = new RelayCommand(
-                        param => this.AddImageClick(), 
+                        param => AddImageClick(), 
                         param => { return true; });
                 }
                 return _AddImage;
             }
         }
-
-        public void AddImageClick()
-        {
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();            dlg.DefaultExt = ".jpg";            dlg.Filter = "(*.jpg)|*.jpg";            Nullable<bool> result = dlg.ShowDialog();
-            if (result == true)
-            {
-                string filename = dlg.FileName;
-                image.Source = new TransformedBitmap(new BitmapImage(new Uri(filename)),
-                    new ScaleTransform(0.35, 0.35));
-            }
-        }
-
-        private ICommand _LeftLearningPoint;
-        private ICommand _RightLearningPoint;
-        private ICommand _TopLearningPoint;
-        private ICommand _BottomLearningPoint;
 
         public ICommand LeftLearningPoint
         {
@@ -72,7 +100,7 @@ namespace EarRecognition
                 {
                     _LeftLearningPoint = new RelayCommand(
                         param => { clickedPointButton = 0; },
-                        param => this.CanLearningPoint());
+                        param => { return image.Source != null && leftPoint == null; });
                 }
                 return _LeftLearningPoint;
             }
@@ -86,7 +114,7 @@ namespace EarRecognition
                 {
                     _RightLearningPoint = new RelayCommand(
                         param => { clickedPointButton = 1; },
-                        param => this.CanLearningPoint());
+                        param => { return image.Source != null && rightPoint == null; });
                 }
                 return _RightLearningPoint;
             }
@@ -100,7 +128,7 @@ namespace EarRecognition
                 {
                     _TopLearningPoint = new RelayCommand(
                         param => { clickedPointButton = 2; },
-                        param => this.CanLearningPoint());
+                        param => { return image.Source != null && topPoint == null; });
                 }
                 return _TopLearningPoint;
             }
@@ -114,18 +142,29 @@ namespace EarRecognition
                 {
                     _BottomLearningPoint = new RelayCommand(
                         param => { clickedPointButton = 3; },
-                        param => this.CanLearningPoint());
+                        param => { return image.Source != null && bottomPoint == null; });
                 }
                 return _BottomLearningPoint;
             }
         }
 
-        public bool CanLearningPoint()
+        public ICommand ClearPoints
         {
-            return image.Source != null;
+            get
+            {
+                if (_ClearPoints == null)
+                {
+                    _ClearPoints = new RelayCommand(
+                        param => ClearPointsClick(),
+                        param => {
+                            return leftPoint != null || rightPoint != null
+                                || topPoint != null || bottomPoint != null;
+                        });
+                }
+                return _ClearPoints;
+            }
         }
 
-        private ICommand _AddToDatabase;
         public ICommand AddToDatabase
         {
             get
@@ -133,23 +172,137 @@ namespace EarRecognition
                 if (_AddToDatabase == null)
                 {
                     _AddToDatabase = new RelayCommand(
-                        param => this.AddToDatabaseClick(),
-                        param => this.CanAddToDatabase());
+                        param => AddToDatabaseClick(),
+                        param => CanAddToDatabase());
                 }
                 return _AddToDatabase;
             }
         }
 
+        public ICommand Recognize
+        {
+            get
+            {
+                if (_Recognize == null)
+                {
+                    _Recognize = new RelayCommand(
+                        param => RecognizeClick(),
+                        param => CanRecognize());
+                }
+                return _Recognize;
+            }
+        }
+
+        #endregion
+
+        public void OpenDatabaseClick()
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();            dlg.DefaultExt = ".xml";            dlg.Filter = "(*.xml)|*.xml";            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
+            {
+                DataAccessLayer.databasePath = dlg.FileName;
+                databaseName.Content = DataAccessLayer.databasePath.Split('\\')
+                    [DataAccessLayer.databasePath.Split('\\').Count() - 1];
+            }
+        }
+
+        public void CreateDatabaseClick()
+        {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();            dlg.FileName = "nowa baza";            dlg.DefaultExt = ".xml";            dlg.Filter = "(*.xml)|*.xml";            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
+            {
+                DataAccessLayer.CreateNewDatabase(dlg.FileName);
+                DataAccessLayer.databasePath = dlg.FileName;
+                databaseName.Content = DataAccessLayer.databasePath.Split('\\')
+                    [DataAccessLayer.databasePath.Split('\\').Count() - 1];
+            }
+        }
+
+        public void AddImageClick()
+        {
+            image.Source = null;
+            bitmap = null;
+            learningName.Text = null;
+            learningSurname.Text = null;
+            recognizedName.Content = null;
+            recognizedSurname.Content = null;
+            ClearMarkedPoints();
+
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();            dlg.DefaultExt = ".jpg";            dlg.Filter = "(*.jpg)|*.jpg";            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
+            {
+                string filename = dlg.FileName;
+                Bitmap originalBitmap = new Bitmap(filename);
+                bitmap = new Bitmap(originalBitmap, 
+                    new System.Drawing.Size((int)(originalBitmap.Width * 0.35), (int)(originalBitmap.Height * 0.35)));
+                image.Source = new TransformedBitmap(new BitmapImage(new Uri(filename)),
+                    new ScaleTransform(0.35, 0.35));
+            }
+        }
+
+        public void ClearPointsClick()
+        {
+            ClearMarkedPoints();
+        }
+
         public void AddToDatabaseClick()
         {
-            //TODO
+            Person person = new Person()
+            {
+                name = learningName.Text,
+                surname = learningSurname.Text,
+                earHeight = (int)(bottomPoint.Value.Y - topPoint.Value.Y),
+                earWidth = (int)(rightPoint.Value.X - leftPoint.Value.X)
+            };
+            person.CalculateDarkPixelsCount(bitmap, leftPoint.Value, topPoint.Value);
+
+            if (DataAccessLayer.AddPerson(person))
+            {
+                MessageBox.Show("Dodano do bazy danych", "Informacja");
+                image.Source = null;
+                bitmap = null;
+                learningName.Text = null;
+                learningSurname.Text = null;
+                recognizedName.Content = null;
+                recognizedSurname.Content = null;
+                ClearMarkedPoints();
+            }
+            else
+                MessageBox.Show("Wystąpił błąd", "Informacja");
+        }
+
+        public void RecognizeClick()
+        {
+            Person person = new Person()
+            {
+                earHeight = (int)(bottomPoint.Value.Y - topPoint.Value.Y),
+                earWidth = (int)(rightPoint.Value.X - leftPoint.Value.X)
+            };
+            person.CalculateDarkPixelsCount(bitmap, leftPoint.Value, topPoint.Value);
+
+            try
+            {
+                Person foundPerson = DataAccessLayer.FindPerson(person);
+                recognizedName.Content = foundPerson.name;
+                recognizedSurname.Content = foundPerson.surname;
+            }
+            catch(ArgumentException e)
+            {
+                MessageBox.Show("Baza danych jest pusta", "Informacja");
+            }
         }
 
         public bool CanAddToDatabase()
         {
             return image.Source != null && leftPoint != null && rightPoint != null 
                 && topPoint != null && bottomPoint != null 
-                && learningName.Text != null && learningSurname.Text != null;
+                && learningName.Text != string.Empty && learningSurname.Text != string.Empty;
+        }
+
+        public bool CanRecognize()
+        {
+            return image.Source != null && leftPoint != null && rightPoint != null
+               && topPoint != null && bottomPoint != null;
         }
 
         public void DrawPoint(object sender, MouseButtonEventArgs e)
@@ -163,32 +316,73 @@ namespace EarRecognition
                 {
                     Width = 10,
                     Height = 10,
-                    Fill = Brushes.Red
+                    Fill = System.Windows.Media.Brushes.Red
                 };
                 canvas.Children.Add(ellipse);
-                Point center = e.GetPosition(canvas);
+                System.Windows.Point center = e.GetPosition(canvas);
                 Canvas.SetLeft(ellipse, center.X - ellipse.Width / 2);
                 Canvas.SetTop(ellipse, center.Y - ellipse.Height / 2);
 
                 switch (clickedPointButton)
                 {
                     case 0:
-                        lefLearningPoint.Content = $"({center.X},{center.Y})";
+                        if(mode.IsChecked.Value)
+                            leftRecognitionPoint.Content = $"({center.X},{center.Y})";
+                        else
+                            leftLearningPoint.Content = $"({center.X},{center.Y})";
                         leftPoint = center;
                         break;
                     case 1:
-                        rightLearningPoint.Content = $"({center.X},{center.Y})";
+                        if (mode.IsChecked.Value)
+                            rightRecognitionPoint.Content = $"({center.X},{center.Y})";
+                        else
+                            rightLearningPoint.Content = $"({center.X},{center.Y})";
                         rightPoint = center;
                         break;
                     case 2:
-                        topLearningPoint.Content = $"({center.X},{center.Y})";
+                        if (mode.IsChecked.Value)
+                            topRecognitionPoint.Content = $"({center.X},{center.Y})";
+                        else
+                            topLearningPoint.Content = $"({center.X},{center.Y})";
                         topPoint = center;
                         break;
                     case 3:
-                        bottomLearningPoint.Content = $"({center.X},{center.Y})";
+                        if (mode.IsChecked.Value)
+                            bottomRecognitionPoint.Content = $"({center.X},{center.Y})";
+                        else
+                            bottomLearningPoint.Content = $"({center.X},{center.Y})";
                         bottomPoint = center;
                         break;
                 }
-            }        }
+            }            clickedPointButton = -1;        }
+
+        public void ChangeMode(object sender, RoutedEventArgs e)
+        {
+            recognition.IsEnabled = !recognition.IsEnabled;
+            learning.IsEnabled = !learning.IsEnabled;
+            image.Source = null;
+            learningName.Text = null;
+            learningSurname.Text = null;
+            recognizedName.Content = null;
+            recognizedSurname.Content = null;
+            ClearMarkedPoints();
+        }
+
+        private void ClearMarkedPoints()
+        {
+            leftPoint = null;
+            rightPoint = null;
+            topPoint = null;
+            bottomPoint = null;
+            leftLearningPoint.Content = "Współrzędne";
+            rightLearningPoint.Content = "Współrzędne";
+            topLearningPoint.Content = "Współrzędne";
+            bottomLearningPoint.Content = "Współrzędne";
+            leftRecognitionPoint.Content = "Współrzędne";
+            rightRecognitionPoint.Content = "Współrzędne";
+            topRecognitionPoint.Content = "Współrzędne";
+            bottomRecognitionPoint.Content = "Współrzędne";
+            canvas.Children.RemoveRange(1, canvas.Children.Count - 1);
+        }
     }
 }

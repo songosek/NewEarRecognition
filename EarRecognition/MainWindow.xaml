@@ -10,8 +10,8 @@
         <Canvas MouseDown="DrawPoint" Name="canvas" HorizontalAlignment="Left" Height="480" Width="319" Margin="35,23,0,0" VerticalAlignment="Top">
             <Image Name="image" />
         </Canvas>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="237" Margin="520,33,0,0" VerticalAlignment="Top" Width="344">
-            <StackPanel>
+        <Border Name="learning" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="246" Margin="520,33,0,0" VerticalAlignment="Top" Width="344">
+            <StackPanel Margin="0,0,0,-10">
                 <Button Content="dodaj zdjecie" Command="{Binding AddImage}"/>
                 <StackPanel Orientation="Horizontal">
                     <Label Content="Podaj imię:"/>
@@ -24,7 +24,7 @@
                 <Label Content="Punkty krańcowe"/>
                 <StackPanel Orientation="Horizontal">
                     <Button Command="{Binding LeftLearningPoint}" Content="Skrajny punkt po lewej:"/>
-                    <Label Content="Współrzędne" Name="lefLearningPoint"/>
+                    <Label Content="Współrzędne" Name="leftLearningPoint"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Button Command="{Binding RightLearningPoint}" Content="Skrajny punkt po prawej:"/>
@@ -39,35 +39,43 @@
                     <Label Content="Współrzędne" Name="bottomLearningPoint"/>
                 </StackPanel>
 
+                <Button Command="{Binding ClearPoints}" Content="wyczyść punkty"/>
                 <Button Command="{Binding AddToDatabase}" Content="dodaj"/>
 
             </StackPanel>
         </Border>
 
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="236" Margin="520,296,0,0" VerticalAlignment="Top" Width="344">
+        <CheckBox Name="mode" Checked="ChangeMode" Unchecked="ChangeMode" Content="Rozpoznawanie" HorizontalAlignment="Left" Margin="520,292,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.676,0.533"/>
+        
+        <Border Name="recognition" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="236" Margin="520,312,0,0" VerticalAlignment="Top" Width="344">
             <StackPanel>
-                <Button Content="wczytaj zdjęcie"/>
+                <Button Content="dodaj zdjecie" Command="{Binding AddImage}"/>
                 <Label Content="Punkty krańcowe"/>
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Skrajny punkt po lewej:"/>
-                    <Label Content="Współrzędne"/>
+                    <Button Command="{Binding LeftLearningPoint}" Content="Skrajny punkt po lewej:"/>
+                    <Label Content="Współrzędne" Name="leftRecognitionPoint"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Skrajny punkt po prawej:"/>
-                    <Label Content="Współrzędne"/>
+                    <Button Command="{Binding RightLearningPoint}" Content="Skrajny punkt po prawej:"/>
+                    <Label Content="Współrzędne" Name="rightRecognitionPoint"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Skrajny punkt na górze:"/>
-                    <Label Content="Współrzędne"/>
+                    <Button Command="{Binding TopLearningPoint}" Content="Skrajny punkt na górze:"/>
+                    <Label Content="Współrzędne" Name="topRecognitionPoint"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Skrajny punkt na dole:"/>
-                    <Label Content="Współrzędne"/>
+                    <Button Command="{Binding BottomLearningPoint}" Content="Skrajny punkt na dole:"/>
+                    <Label Content="Współrzędne" Name="bottomRecognitionPoint"/>
                 </StackPanel>
-                <Button Content="Rozpoznaj"/>
-                <Label Content="(imię)"/>
-                <Label Content="(nazwisko)"/>
+                <Button Command="{Binding ClearPoints}" Content="wyczyść punkty"/>
+                <Button Command="{Binding Recognize}" Content="Rozpoznaj"/>
+                <Label Content="(imię)" Name="recognizedName"/>
+                <Label Content="(nazwisko)" Name="recognizedSurname"/>
             </StackPanel>
         </Border>
+        <Button Command="{Binding CreateDatabase}" Content="Stwórz bazę" HorizontalAlignment="Left" Margin="420,115,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button Command="{Binding OpenDatabase}" Content="Otwórz bazę" HorizontalAlignment="Left" Margin="420,153,0,0" VerticalAlignment="Top" Width="75"/>
+        <Label Content="Aktualna baza:" HorizontalAlignment="Left" Margin="420,192,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.474,0.423"/>
+        <Label Name="databaseName" HorizontalAlignment="Left" Margin="441,218,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>
